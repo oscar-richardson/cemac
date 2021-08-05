@@ -1,18 +1,34 @@
-let timeSeriesData = {};
-let heatMapData = {};
+let numDatasets = 4;
+let timeSeriesData = [];
+let objects = [];
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
 
-    fetch('/timeseries.json')
-        .then(response => response.json())
-        .then(data => {
-            timeSeriesData = data;
-        })
+    async function fetchData(url) {
+        let res = await fetch(url);
+        let data = await res.json()
+        return data;
+    }
 
-    fetch('/heatmap.json')
-        .then(response => response.json())
-        .then(data => {
-            heatMapData = data;
-        })
+    for (let i = 1; i < numDatasets + 1; i++) {
+        timeSeriesData.push(await fetchData('/timeseriesatmotube' + i + '.json'));
+    }
+
+    for (let i = 0; i < timeSeriesData.length; i++) {
+        objects.push({
+            type: "scatter",
+            mode: "lines",
+            name: 'Atmotube ' + (i + 1),
+            x: Object.values(timeSeriesData[i]['Date']),
+            y: Object.values(timeSeriesData[i]['PM10, ug/m3']),
+            /* line: { color: '#17BECF' } */
+        });
+    }
+
+    let layout = {
+        title: 'Basic Time Series',
+    };
+
+    Plotly.newPlot('myDiv', objects, layout);
 
 });
