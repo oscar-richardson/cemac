@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     for (let i = 1; i < numDatasets + 1; i++) {
-        timeSeriesData.push(await fetchData('/timeseriesatmotube' + i + '.json'));
+        timeSeriesData.push(await fetchData('https://raw.githubusercontent.com/oscar-richardson/cemac/main/timeseriesatmotube' + i + '.json'));
     }
 
     features.forEach(function(feature) {
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     Plotly.newPlot('myDiv', objects['PM2.5, ug/m3'], layout['PM2.5, ug/m3'], plot_config);
 
 
-    heatMapData = await fetchData('/heatmap.json');
+    heatMapData = await fetchData('https://raw.githubusercontent.com/oscar-richardson/cemac/main/heatmap.json');
 
     mymap = L.map('mapid').setView([53.8063176, -1.800116], 18);
 
