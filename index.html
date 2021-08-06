@@ -6,13 +6,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.plot.ly/plotly-2.3.0.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <script src="leaflet-heat.js"></script>
 </head>
 
 <body>
+    <select id="change_chart">
+        <option value="PM1, ug/m3">PM1</option>
+        <option value="PM2.5, ug/m3" selected>PM2.5</option>
+        <option value="PM10, ug/m3">PM10</option>
+    </select>
     <div id='myDiv'>
         <!-- Plotly chart will be drawn inside this DIV -->
     </div>
+    <div id="mapid">
+        <div class="leaflet-legend">
+            <div class="leaflet-legend-header">
+                Mean PM2.5 density per square
+            </div>
+        </div>
+    </div>
+
     <script src="main.js"></script>
 </body>
 

@@ -51,7 +51,10 @@ for i in range(len(df_list)):
     df_list[i].to_json('timeseriesatmotube' + str(i+1) + '.json')
 
 
-heat_map = heat_map[heat_map.Longitude < -1.7979444500000001]
+#heat_map.to_json('heatmap.json')
+
+
+#heat_map = heat_map[heat_map.Longitude < -1.7979444500000001]
 
 long_min = heat_map['Longitude'].min()
 long_max = heat_map['Longitude'].max()
@@ -64,7 +67,7 @@ lat_distance = gp.distance((lat_max, long_mid), ((lat_min, long_mid))).m
 
 grid_size = 1
 num_cuts = {'Longitude': round(long_distance/grid_size), 'Latitude': round(lat_distance/grid_size)}
-cuts = pd.DataFrame({str(feature) + ' Bin' : pd.cut(heat_map[feature], num_cuts[feature]) \
+cuts = pd.DataFrame({str(feature) + ' Bin' : pd.cut(heat_map[feature], num_cuts[feature], precision=100) \
                      for feature in ['Longitude', 'Latitude']}) #creates DF where Long and Lat columns are the bin each datapoint goes in
 groups = heat_map.join(cuts).groupby(list(cuts)) #joins the DFs and divides into groups based on Long and Lat bins
 means = groups.mean()
@@ -97,11 +100,12 @@ means = means.iloc[::-1]
 for dependent_var in ['PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3']:
     plt.figure('Heat map ' + dependent_var)
     sb.heatmap(means[dependent_var], \
-           xticklabels = means[dependent_var].columns.map(lambda x : x.left), \
-           yticklabels = means[dependent_var].index.map(lambda x : x.left), \
+           xticklabels = False, \
+           yticklabels = False, \
                cmap = 'coolwarm')
     plt.title('Heat map showing how density of ' + dependent_var + ' varies with location')
     plt.tight_layout()
+
 
 """
 If Long/Lat columns of dataset are empty, we get:
