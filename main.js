@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         L.rectangle([
             [dataPoint['latBottom'], dataPoint['longLeft']],
             [dataPoint['latTop'], dataPoint['longRight']]
-        ], { color: colors[Math.ceil(dataPoint['pm2.5'] / parseFloat(ranges[1])) - 1], weight: 0, fillOpacity: 0.6 }).bindPopup('Latitude: ' + String(dataPoint['latBottom']) + ' to ' + String(dataPoint['latTop']) + '<br>Longitude: ' + String(dataPoint['longLeft']) + ' to ' + String(dataPoint['longRight']) + '<br>Mean PM1 : ' + String(dataPoint['pm1']) + ' ug/m3<br>Mean PM2.5 : ' + String(dataPoint['pm2.5']) + ' ug/m3<br>Mean PM10 : ' + String(dataPoint['pm10']) + ' ug/m3<br>Number of observations: ' + String(dataPoint['observations'])).addTo(mymap);
+        ], { color: colors[Math.ceil(dataPoint['pm2.5'] / parseFloat(ranges[1])) - 1], weight: 0, fillOpacity: 0.6 }).bindTooltip('Latitude: ' + String(dataPoint['latBottom']) + ' to ' + String(dataPoint['latTop']) + '<br>Longitude: ' + String(dataPoint['longLeft']) + ' to ' + String(dataPoint['longRight']) + '<br>Mean PM1 : ' + String(dataPoint['pm1']) + ' ug/m3<br>Mean PM2.5 : ' + String(dataPoint['pm2.5']) + ' ug/m3<br>Mean PM10 : ' + String(dataPoint['pm10']) + ' ug/m3<br>Number of observations: ' + String(dataPoint['observations'])).addTo(mymap);
     });
 
     var menu = document.getElementById("change_chart");
