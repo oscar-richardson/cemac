@@ -19,11 +19,14 @@ for i in range(num_datasets):
     new_df = new_df[['Longitude', 'Latitude', 'Date', 'PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3']]\
     .dropna(subset=['Date', 'PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3'])\
         .reset_index(drop=True)
+    new_df['Atmotube number'] = i;
     df_list.append(new_df)
 
 heat_map = pd.concat(df_list)
 heat_map = heat_map.dropna(subset=['Longitude', 'Latitude'])\
         .reset_index(drop=True)
+        
+#heat_map.to_csv('heatmap.csv')
 
 
 for df in df_list:
@@ -65,7 +68,7 @@ lat_mid = (lat_min + lat_max)/2
 long_distance = gp.distance((lat_mid, long_max), ((lat_mid, long_min))).m
 lat_distance = gp.distance((lat_max, long_mid), ((lat_min, long_mid))).m
 
-grid_size = 1
+grid_size = 5
 num_cuts = {'Longitude': round(long_distance/grid_size), 'Latitude': round(lat_distance/grid_size)}
 cuts = pd.DataFrame({str(feature) + ' Bin' : pd.cut(heat_map[feature], num_cuts[feature], precision=100) \
                      for feature in ['Longitude', 'Latitude']}) #creates DF where Long and Lat columns are the bin each datapoint goes in
@@ -75,6 +78,7 @@ means_dropna = means.dropna()
 start = groups.Date.min().dropna()
 end = groups.Date.max().dropna()
 observations = groups.Date.count().replace(0, np.nan).dropna()
+atmotubes = groups['Atmotube number'].nunique().replace(0, np.nan).dropna()
 
 dict_list = []
 
@@ -83,15 +87,16 @@ for i in means_dropna.index:
      'longRight': i[0].right, 
      'latBottom': i[1].left,
      'latTop': i[1].right,
-     'pm1': means_dropna.loc[i]['PM1, ug/m3'],
-     'pm2.5': means_dropna.loc[i]['PM2.5, ug/m3'],
-     'pm10': means_dropna.loc[i]['PM10, ug/m3'],
+     'PM1, ug/m3': means_dropna.loc[i]['PM1, ug/m3'],
+     'PM2.5, ug/m3': means_dropna.loc[i]['PM2.5, ug/m3'],
+     'PM10, ug/m3': means_dropna.loc[i]['PM10, ug/m3'],
      'start': str(start.loc[i]),
      'end': str(end.loc[i]),
-     'observations': observations.loc[i]}
+     'observations': observations.loc[i],
+     'atmotubes': atmotubes.loc[i]}
     dict_list.append(new_dict)
 
-with open('heatmap.json', 'w') as fout:
+with open('heatmap2.json', 'w') as fout:
     json.dump(dict_list, fout, separators=(',', ':'))
 
 means = means.unstack(level = 0)
