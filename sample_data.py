@@ -10,12 +10,12 @@ import numpy as np
 import seaborn as sb
 
 
-num_datasets = 4
-parser = lambda x: dt.datetime.strptime(x, '%d/%m/%Y %H:%M')
+num_datasets = 5
+parser = lambda x: dt.datetime.strptime(x, '%d/%m/%Y %H:%M:%S')
 df_list = []
 
 for i in range(num_datasets):
-    new_df = pd.read_csv('Atmotube ' + str(i+1) + ' Data.csv', parse_dates=['Date'], date_parser=parser)
+    new_df = pd.read_csv('/data/st_stephens' + str(i+1) + '__04_10.csv', parse_dates=['Date'], date_parser=parser)
     new_df = new_df[['Longitude', 'Latitude', 'Date', 'PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3']]\
     .dropna(subset=['Date', 'PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3'])\
         .reset_index(drop=True)
@@ -25,8 +25,6 @@ for i in range(num_datasets):
 heat_map = pd.concat(df_list)
 heat_map = heat_map.dropna(subset=['Longitude', 'Latitude'])\
         .reset_index(drop=True)
-        
-#heat_map.to_csv('heatmap.csv')
 
 
 for df in df_list:
@@ -51,13 +49,7 @@ for feature in ['PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3']:
 
 for i in range(len(df_list)):
     df_list[i]['Date'] = df_list[i]['Date'].astype(str)
-    df_list[i].to_json('timeseriesatmotube' + str(i+1) + '.json')
-
-
-#heat_map.to_json('heatmap.json')
-
-
-#heat_map = heat_map[heat_map.Longitude < -1.7979444500000001]
+    df_list[i].to_json('timeseries' + str(i+1) + '.json')
 
 long_min = heat_map['Longitude'].min()
 long_max = heat_map['Longitude'].max()
@@ -68,48 +60,50 @@ lat_mid = (lat_min + lat_max)/2
 long_distance = gp.distance((lat_mid, long_max), ((lat_mid, long_min))).m
 lat_distance = gp.distance((lat_max, long_mid), ((lat_min, long_mid))).m
 
-grid_size = 5
-num_cuts = {'Longitude': round(long_distance/grid_size), 'Latitude': round(lat_distance/grid_size)}
-cuts = pd.DataFrame({str(feature) + ' Bin' : pd.cut(heat_map[feature], num_cuts[feature], precision=100) \
-                     for feature in ['Longitude', 'Latitude']}) #creates DF where Long and Lat columns are the bin each datapoint goes in
-groups = heat_map.join(cuts).groupby(list(cuts)) #joins the DFs and divides into groups based on Long and Lat bins
-means = groups.mean()
-means_dropna = means.dropna()
-start = groups.Date.min().dropna()
-end = groups.Date.max().dropna()
-observations = groups.Date.count().replace(0, np.nan).dropna()
-atmotubes = groups['Atmotube number'].nunique().replace(0, np.nan).dropna()
+grid_sizes = [5, 10, 50]
 
-dict_list = []
+for grid_size in grid_sizes:
+    num_cuts = {'Longitude': round(long_distance/grid_size), 'Latitude': round(lat_distance/grid_size)}
+    cuts = pd.DataFrame({str(feature) + ' Bin' : pd.cut(heat_map[feature], num_cuts[feature], precision=100) \
+                         for feature in ['Longitude', 'Latitude']}) #creates DF where Long and Lat columns are the bin each datapoint goes in
+    groups = heat_map.join(cuts).groupby(list(cuts)) #joins the DFs and divides into groups based on Long and Lat bins
+    means = groups.mean()
+    means_dropna = means.dropna()
+    start = groups.Date.min().dropna()
+    end = groups.Date.max().dropna()
+    observations = groups.Date.count().replace(0, np.nan).dropna()
+    atmotubes = groups['Atmotube number'].nunique().replace(0, np.nan).dropna()
 
-for i in means_dropna.index:
-    new_dict = {'longLeft': i[0].left, 
-     'longRight': i[0].right, 
-     'latBottom': i[1].left,
-     'latTop': i[1].right,
-     'PM1, ug/m3': means_dropna.loc[i]['PM1, ug/m3'],
-     'PM2.5, ug/m3': means_dropna.loc[i]['PM2.5, ug/m3'],
-     'PM10, ug/m3': means_dropna.loc[i]['PM10, ug/m3'],
-     'start': str(start.loc[i]),
-     'end': str(end.loc[i]),
-     'observations': observations.loc[i],
-     'atmotubes': atmotubes.loc[i]}
-    dict_list.append(new_dict)
-
-with open('heatmap2.json', 'w') as fout:
-    json.dump(dict_list, fout, separators=(',', ':'))
-
-means = means.unstack(level = 0)
-means = means.iloc[::-1]
-
-for dependent_var in ['PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3']:
-    plt.figure('Heat map ' + dependent_var)
-    sb.heatmap(means[dependent_var], \
-           xticklabels = False, \
-           yticklabels = False, \
-               cmap = 'coolwarm')
-    plt.title('Heat map showing how density of ' + dependent_var + ' varies with location')
-    plt.tight_layout()
+    dict_list = []
+    
+    for i in means_dropna.index:
+        new_dict = {'longLeft': i[0].left, 
+         'longRight': i[0].right, 
+         'latBottom': i[1].left,
+         'latTop': i[1].right,
+         'PM1, ug/m3': means_dropna.loc[i]['PM1, ug/m3'],
+         'PM2.5, ug/m3': means_dropna.loc[i]['PM2.5, ug/m3'],
+         'PM10, ug/m3': means_dropna.loc[i]['PM10, ug/m3'],
+         'start': str(start.loc[i]),
+         'end': str(end.loc[i]),
+         'observations': observations.loc[i],
+         'atmotubes': atmotubes.loc[i]}
+        dict_list.append(new_dict)
+    
+    with open('heatmap' + str(grid_size) + '.json', 'w') as fout:
+        json.dump(dict_list, fout, separators=(',', ':'))
+    
+    means = means.unstack(level = 0)
+    means = means.iloc[::-1]
+    
+    for dependent_var in ['PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3']:
+        plt.figure('Heat map ' + dependent_var)
+        sb.heatmap(means[dependent_var], \
+               xticklabels = False, \
+               yticklabels = False, \
+                   cmap = 'coolwarm')
+        plt.title('Heat map showing how density of ' + dependent_var + ' varies with location')
+        plt.tight_layout()
 
 
 """

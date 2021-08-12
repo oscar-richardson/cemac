@@ -1,10 +1,10 @@
-let numDatasets = 4,
+let numDatasets = 5,
     timeSeriesData = [],
     initialData = [],
     features = ['PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3'],
     layout = {},
     update = {},
-    binSizes = ['1', '5'],
+    binSizes = ['5', '10', '50'],
     heatMapData = {},
     minMaxData = {},
     min = {},
@@ -14,7 +14,7 @@ let numDatasets = 4,
     layers = {},
     colors = {},
     currentLayer = 'PM2.5, ug/m3',
-    currentBinSize = '1',
+    currentBinSize = '5',
     layersControl;
 
 
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
     for (let i = 1; i < numDatasets + 1; i++) {
-        timeSeriesData.push(await fetchData('https://raw.githubusercontent.com/oscar-richardson/cemac/main/timeseriesatmotube' + i + '.json'));
+        timeSeriesData.push(await fetchData('timeseries' + i + '.json'));
     }
 
     for (let i = 0; i < timeSeriesData.length; i++) {
@@ -43,7 +43,14 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     features.forEach(function(feature) {
         layout[feature] = {
-            title: 'Time series showing how density of ' + feature + ' varies with time'
+            title: {
+                text: 'Time series showing how density of ' + feature + ' varies with time',
+                font: {
+                    family: 'Arial, Helvetica, sans-serif',
+                    size: 18,
+                    color: '#555'
+                }
+            }
         };
         update[feature] = [];
     });
@@ -76,15 +83,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
     function updateTimeSeries(event) {
-        Plotly.update('plotid', update[dropDown.value], layout[dropDown.value], [0, 1, 2, 3]);
+        Plotly.update('plotid', update[dropDown.value], layout[dropDown.value], [0, 1, 2, 3, 4]);
     }
 
 
-    map = L.map('mapid').setView([53.8063176, -1.800116], 19);
+    map = L.map('mapid').setView([53.77875400063466, -1.7551848715634326], 14);
 
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 25,
+        maxZoom: 20,
+        minZoom: 12,
         id: 'mapbox/streets-v11',
         tileSize: 512,
         zoomOffset: -1,
@@ -160,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                         color: colors[feature][getIndex(
                             parseFloat(bin[feature].toFixed(2)), ranges[binSize][feature])],
                         weight: 0,
-                        fillOpacity: 0.6
+                        fillOpacity: 0.8
                     })
                     .bindTooltip(tooltip));
                 if (feature == 'PM2.5, ug/m3' || feature == 'PM10, ug/m3') {
@@ -168,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                             color: colors[feature + ' (DAQI)'][getIndex(
                                 parseFloat(bin[feature].toFixed(2)), ranges[binSize][feature + ' (DAQI)'])],
                             weight: 0,
-                            fillOpacity: 0.6
+                            fillOpacity: 0.4
                         })
                         .bindTooltip(tooltip));
                 }
@@ -219,18 +227,24 @@ document.addEventListener('DOMContentLoaded', async function() {
     map.on('zoomend', function() {
         let zoomLevel = map.getZoom();
         if (zoomLevel >= 18) {
-            if (currentBinSize !== '1') {
-                unsetBinSize();
-                setBinSize('1');
-            }
-        }
-        if (zoomLevel < 18) {
             if (currentBinSize !== '5') {
                 unsetBinSize();
                 setBinSize('5');
             }
         }
+        if (zoomLevel < 18 && zoomLevel >= 14) {
+            if (currentBinSize !== '10') {
+                unsetBinSize();
+                setBinSize('10');
+            }
+        }
+        if (zoomLevel < 14) {
+            if (currentBinSize !== '50') {
+                unsetBinSize();
+                setBinSize('50');
+            }
+        }
     });
 
-    setBinSize('1');
+    setBinSize('10');
 });
