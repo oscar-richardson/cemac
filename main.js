@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
     for (let i = 1; i < numDatasets + 1; i++) {
-        timeSeriesData.push(await fetchData('timeseries' + i + '.json'));
+        timeSeriesData.push(await fetchData('https://raw.githubusercontent.com/oscar-richardson/cemac/main/timeseries' + i + '.json'));
     }
 
     for (let i = 0; i < timeSeriesData.length; i++) {
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         ranges[binSize]['PM2.5, ug/m3 (DAQI)'] = ['0.00', '35.49', '53.49', '70.49'];
         ranges[binSize]['PM10, ug/m3 (DAQI)'] = ['0.00', '50.49', '75.49', '100.49'];
 
-        heatMapData[binSize] = await fetchData('/heatmap' + binSize + '.json');
+        heatMapData[binSize] = await fetchData('https://raw.githubusercontent.com/oscar-richardson/cemac/main/heatmap' + binSize + '.json');
 
         heatMapData[binSize].forEach(function(bin) {
             features.forEach(function(feature) {
