@@ -1,10 +1,11 @@
-let numDatasets = 5,
-    timeSeriesData = [],
-    initialData = [],
+const numDatasets = 5,
     features = ['PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3'],
+    binSizes = ['5', '10', '50'];
+
+let timeSeriesData = [],
+    initialData = [],
     layout = {},
     update = {},
-    binSizes = ['5', '10', '50'],
     heatMapData = {},
     minMaxData = {},
     min = {},
@@ -55,9 +56,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         update[feature] = [];
     });
 
-    let initialLayout = JSON.parse(JSON.stringify(layout['PM2.5, ug/m3']));
+    const initialLayout = JSON.parse(JSON.stringify(layout['PM2.5, ug/m3']));
 
-    let plot_config = {
+    const plot_config = {
         'showLink': false,
         'linkText': '',
         'displaylogo': false,
@@ -66,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     Plotly.newPlot('plotid', initialData, initialLayout, plot_config);
 
-    let dropDown = document.getElementById('drop-down');
+    const dropDown = document.getElementById('drop-down');
     dropDown.addEventListener("change", updateTimeSeries);
 
     features.forEach(function(feature) {
@@ -87,10 +88,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
 
-    map = L.map('mapid').setView([53.77875400063466, -1.7551848715634326], 14);
+    map = L.map('mapid', { attributionControl: false, zoomControl: false }).setView([53.77875400063466, -1.7551848715634326], 14);
 
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 20,
         minZoom: 12,
         id: 'mapbox/streets-v11',
@@ -99,7 +99,33 @@ document.addEventListener('DOMContentLoaded', async function() {
         accessToken: 'pk.eyJ1Ijoib3NjYXItcmljaGFyZHNvbiIsImEiOiJja3MwMDJheWkwaWw0MndwanBtbzl3djNvIn0.1wg7WwvVPp3elm4fyOpVfA'
     }).addTo(map);
 
-    L.control.scale().addTo(map);
+    const attributionControl = L.control.attribution({ prefix: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>' })
+    attributionControl.addTo(map);
+    L.DomUtil.addClass(attributionControl.getContainer(), 'attribution-control');
+
+    const zoomControl = L.control.zoom();
+    zoomControl.addTo(map);
+    L.DomUtil.addClass(zoomControl.getContainer(), 'zoom-control');
+
+    const printer = L.easyPrint({
+        exportOnly: true,
+        hidden: true,
+        hideControlContainer: false,
+        hideClasses: ['attribution-control', 'zoom-control', 'layers-control']
+    }).addTo(map);
+
+    const btn = document.querySelector('.button');
+
+    btn.addEventListener('click', function() {
+        btn.classList.add("button--loading");
+        setTimeout(function() {
+            printer.printMap('CurrentSize');
+        }, 10);
+    });
+
+    map.on('easyPrint-finished', function(ev) {
+        btn.classList.toggle("button--loading");
+    });
 
     function getIndex(value, array) {
         for (let i = 1; i < array.length; i++) {
@@ -196,10 +222,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     function setBinSize(binSize) {
         layersControl = L.control.layers(layers[binSize]);
         layersControl.addTo(map);
+        L.DomUtil.addClass(layersControl.getContainer(), 'layers-control');
 
         map.on('baselayerchange', onBaseLayerChange);
 
-        let leafletLegend = document.querySelector('.leaflet-legend');
+        const leafletLegend = document.querySelector('.leaflet-legend');
 
         function onBaseLayerChange(e) {
             currentLayer = e.name;

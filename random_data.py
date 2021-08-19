@@ -13,7 +13,18 @@ columns = ['Date', 'VOC, ppm', 'AQS', 'Temperature, °C', 'Humidity, %',
            'Latitude', 'Longitude']
 
 weeks = {
-    '04_10' : [3, 10]
+    '04_10' : [3, 10],
+    '11_10' : [10, 10],
+    '18_10' : [17, 10],
+    '25_10' : [24, 10],
+    '01_11' : [31, 10],
+    '08_11' : [7, 11],
+    '15_11' : [14, 11],
+    '22_11' : [21, 11],
+    '29_11' : [28, 11],
+    '06_12' : [5, 12],
+    '13_12' : [12, 12],
+    '20_12' : [19, 12]
     }
 
 schools = {
@@ -197,7 +208,7 @@ for week in list(weeks.keys()):
                              aqs_value, temp_value, hum_value, round(press, 2), 
                              pm1_value, pm2p5_value, pm10_value, lat_value, long_value]
                 
-            df.to_csv('/data/' + school + str(atmotube) + '__' + week + '.csv', index=False)
+            df.to_csv(school + str(atmotube) + '__' + week + '.csv', index=False)
             print('Saved ' + school + str(atmotube) + '__' + week + '.csv')
             end_time = perf_counter()
             print('Completed in ' + str(end_time - start_time) + ' seconds')

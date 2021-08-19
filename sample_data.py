@@ -8,18 +8,19 @@ import json
 import geopy.distance as gp
 import numpy as np
 import seaborn as sb
+from time import perf_counter
 
-
+start_time = perf_counter()
 num_datasets = 5
 parser = lambda x: dt.datetime.strptime(x, '%d/%m/%Y %H:%M:%S')
 df_list = []
 
 for i in range(num_datasets):
-    new_df = pd.read_csv('/data/st_stephens' + str(i+1) + '__04_10.csv', parse_dates=['Date'], date_parser=parser)
+    new_df = pd.read_csv('data/st_stephens' + str(i+1) + '__04_10.csv', parse_dates=['Date'], date_parser=parser)
     new_df = new_df[['Longitude', 'Latitude', 'Date', 'PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3']]\
     .dropna(subset=['Date', 'PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3'])\
         .reset_index(drop=True)
-    new_df['Atmotube number'] = i;
+    new_df['Atmotube number'] = i
     df_list.append(new_df)
 
 heat_map = pd.concat(df_list)
@@ -105,6 +106,9 @@ for grid_size in grid_sizes:
         plt.title('Heat map showing how density of ' + dependent_var + ' varies with location')
         plt.tight_layout()
 
+end_time = perf_counter()
+print('Completed in ' + str(end_time - start_time) + ' seconds')
+print('')
 
 """
 If Long/Lat columns of dataset are empty, we get:

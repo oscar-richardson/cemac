@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/oscar-richardson/cemac/issues"
   },
-  "homepage": "https://github.com/oscar-richardson/cemac#readme"
+  "homepage": "https://github.com/oscar-richardson/cemac#readme",
+  "dependencies": {
+    "leaflet-easyprint": "^2.1.9"
+  }
 }
