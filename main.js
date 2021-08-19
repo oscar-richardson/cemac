@@ -107,6 +107,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     zoomControl.addTo(map);
     L.DomUtil.addClass(zoomControl.getContainer(), 'zoom-control');
 
+    L.control.scale().addTo(map);
+
     const printer = L.easyPrint({
         exportOnly: true,
         hidden: true,
