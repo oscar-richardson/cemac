@@ -1,4 +1,4 @@
-const numDatasets = 5,
+const numDatasets = 1,
     features = ['PM1, ug/m3', 'PM2.5, ug/m3', 'PM10, ug/m3'],
     binSizes = ['5', '10', '50'];
 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
     for (let i = 1; i < numDatasets + 1; i++) {
-        timeSeriesData.push(await fetchData('https://raw.githubusercontent.com/oscar-richardson/cemac/main/timeseries' + i + '.json'));
+        timeSeriesData.push(await fetchData('https://drive.google.com/uc?export=download&id=1k0nn6rgQY5AbuA_WSU9qE05uH4JxDKyt'));
     }
 
     for (let i = 0; i < timeSeriesData.length; i++) {
