@@ -1,0 +1,119 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Hina Mincho', serif;
+}
+
+body {
+    background-image: url("img/sky.jfif");
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.container {
+    background: rgba(128, 128, 128, 0.6);
+    width: 60%;
+    margin: 0 auto;
+}
+
+.header,
+.select-a-school,
+.school,
+.admin {
+    text-align: center;
+}
+
+.header,
+.school-logo {
+    margin-bottom: 16px;
+}
+
+.header {
+    background-color: white;
+}
+
+.select-a-school {
+    margin-bottom: 32px;
+}
+
+h1,
+h2,
+p {
+    font-size: 16px;
+    color: #f5f5f5;
+}
+
+.school {
+    margin-bottom: 64px;
+}
+
+.smallest-logo {
+    width: 75px;
+}
+
+.small-logo {
+    width: 94px;
+}
+
+.medium-logo {
+    width: 101px;
+}
+
+.large-logo {
+    width: 125px;
+}
+
+p {
+    margin: 0 16px;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover {
+    color: yellow;
+}
+
+.admin {
+    padding-bottom: 32px;
+}
+
+@media (min-width: 576px) {
+    h1,
+    h2,
+    p {
+        font-size: 24px;
+    }
+}
+
+@media (min-width: 768px) {
+    .header {
+        display: flex;
+        flex-direction: row-reverse;
+    }
+    .bib-logo {
+        flex: 1;
+    }
+    .title {
+        flex: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        letter-spacing: 10px;
+    }
+    .school {
+        display: flex;
+    }
+    .school-logo {
+        flex: 2;
+    }
+    .school-name {
+        flex: 3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 48px;
+    }
+}
